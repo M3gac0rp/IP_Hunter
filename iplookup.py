@@ -106,12 +106,18 @@ def cve():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Trouver l'élément avec l'ID "ports"
-    element_id = "ports"
+    element_id = "vulnerabilities"
     elements = soup.find(id=element_id)
 
     if elements:
         content = ", ".join([element.text.strip() for element in elements])
-        print(f"Ports ouverts pour l'adresse IP {ip_address}: {content}")
+        print(f"{content}")
     else:
-        print(f"Aucun port ouvert pour l'adresse IP {ip_address}")
+        print(f"Aucunes CVE détectées {ip_address}")
+
+
+cve()
+
+
+
 
