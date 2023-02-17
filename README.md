@@ -1,11 +1,11 @@
 Installation
 Pour utiliser IP Hunter, vous devez installer les modules suivants :
 
-pythonping
-ipaddress
-requests
-whois
-BeautifulSoup
+. pythonping
+. ipaddress
+. requests
+. whois
+. BeautifulSoup
 
 Vous pouvez les installer en exécutant la commande suivante dans votre terminal :
 
