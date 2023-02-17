@@ -3,6 +3,7 @@ import os
 import re
 import ipaddress 
 import requests
+import time
 import whois
 import socket
 from bs4 import BeautifulSoup
@@ -15,9 +16,12 @@ def recup_ip():
     hostname = input("Entrer l'url du site : ").replace("https://", "")
     print()
 
-    ip_address = socket.gethostbyname(hostname)
-    print()
-    print(f"L'adresse IP de {hostname} est {ip_address}")
+    try:
+        ip_address = socket.gethostbyname(hostname)
+        print(f"L'adresse IP de {hostname} est {ip_address}")
+    except socket.gaierror:
+        print(f"Impossible de récupérer l'adresse IP pour {hostname}. Veuillez vérifier l'URL et réessayer.")
+        
     print()
 
 
@@ -62,8 +66,7 @@ def mail():
             if 'wixpress.com' not in email:
                 email_file.write(email + '\n')
 
-
-# Fonction pour récupérer des informations sur un nom de domaine
+# Fonction pour récupérer des informations sur un nom de domaine3
 def get_domain_info():
     print()
     domain_name = input('Nom de domaine/ip : ')
@@ -80,10 +83,12 @@ def get_domain_info():
             info_dict["Creation date"] = str(whois_info.creation_date)
         if whois_info.expiration_date:
             info_dict["Expiration date"] = str(whois_info.expiration_date)
+        
+        print(whois_info)
+        
     except Exception as e:
         print("Error: ", e)
-    print(whois_info)
-
+        print("Failed to retrieve WHOIS information for", domain_name)
 
 
 def is_valid_ip_address(ip_address):
@@ -162,10 +167,11 @@ def ping_ip():
     print()
     while True:
         ip_addr = input('Entrer une IP : ')
-        if is_valid_ip_address(ip_addr):
+        if is_valid_ip_address(ip_addr) and re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip_addr):
             break
         else:
             print(f"{ip_addr} n'est pas une adresse IP valide. Veuillez entrer une adresse IP valide.")
+            continue
     print()
 
     ping_result = ping(ip_addr, verbose=True)
@@ -201,12 +207,19 @@ def menu():
         print("╠════════════════════════════════════════════════════╣")
         print("║               Développé par M3gac0rp               ║")
         print("╚════════════════════════════════════════════════════╝")        
+        print()
+
+
+        choix = input("Entrez votre choix : ")
         print("")
-
-
-        choix = int(input("Entrez votre choix : "))
-        print("")
-
+        
+        try:
+            choix = int(choix)
+        except ValueError:
+            print("Choix invalide. Veuillez réessayer.")
+            time.sleep(3)
+            os.system('cls')
+            continue
 
         if choix == 1:
             recup_ip()
@@ -225,5 +238,7 @@ def menu():
             break
         else:
             print("Choix invalide. Veuillez réessayer.")
+
+        
 os.system('cls')
 menu()
