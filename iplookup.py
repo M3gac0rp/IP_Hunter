@@ -1,22 +1,25 @@
 from pythonping import ping
+import os
 import re
+import ipaddress 
 import requests
 import whois
+import socket
 from bs4 import BeautifulSoup
 import json
+from colorama import Fore, Style
 
 
-def ping_ip():
-    ip_addr = input('Enter the IP address : ')
 
-    ping_result = ping(ip_addr, verbose=True)
+def recup_ip():
+    print()
+    hostname = input("Entrer l'url du site : ").replace("https://", "")
+    print()
 
-    if ping_result.success:
-        print()
-    else:
-        print("Aucun ping possible.")
-
-#ping_ip()
+    ip_address = socket.gethostbyname(hostname)
+    print()
+    print(f"L'adresse IP de {hostname} est {ip_address}")
+    print()
 
 def extract_all_emails_from_webpage(url):
     response = requests.get(url)
@@ -28,10 +31,24 @@ def extract_all_emails_from_webpage(url):
     return emails
 
 def mail():
-    url = input("url ?  ")
-    emails = extract_all_emails_from_webpage(url)
+    print()
+    while True:
+        url = input("url ? : ")
+        print()
+        if not url.startswith("http://") and not url.startswith("https://"):
+            print("L'URL doit commencer par http:// ou https://")
+            print()
+        else:
+            break
+    
+    try:
+        emails = extract_all_emails_from_webpage(url)
+    except requests.exceptions.RequestException as e:
+        print(f"Impossible de récupérer les emails : {e}")
+        return
+
     if emails:
-        print("Adresses email trouvées :")
+        print("Adresses email trouvées : ")
         for email in emails:
             print(" -", email)
     else:
@@ -42,12 +59,12 @@ def mail():
             if 'wixpress.com' not in email:
                 email_file.write(email + '\n')
 
-#mail()
-
-
 
 def get_domain_info():
+    print()
     domain_name = input('Nom de domaine/ip : ')
+    print()
+
     try:
         whois_info = whois.whois(domain_name)
         info_dict = {}
@@ -63,12 +80,26 @@ def get_domain_info():
         print("Error: ", e)
     print(whois_info)
 
-#get_domain_info(domain_name)
+
+
+def is_valid_ip_address(ip_address):
+    try:
+        socket.inet_aton(ip_address)
+        return True
+    except socket.error:
+        return False
 
 
 def port():
     # Adresse IP à rechercher
-    ip_address = input('Entrer une adresse ip : ')
+    print()
+    while True:
+        ip_address = input('Entrer une IP : ')
+        if is_valid_ip_address(ip_address):
+            break
+        else:
+            print(f"{ip_address} n'est pas une adresse IP valide. Veuillez entrer une adresse IP valide.")
+    print()
 
     # URL de la page de résultats de recherche pour l'adresse IP
     url = f'https://www.shodan.io/host/{ip_address}'
@@ -85,16 +116,20 @@ def port():
 
     if elements:
         content = ", ".join([element.text.strip() for element in elements])
-        print(f"Ports ouverts pour l'adresse IP {ip_address}: {content}")
+        print(f"Ports ouverts pour l'adresse IP {ip_address} : {content}")
     else:
         print(f"Aucun port ouvert pour l'adresse IP {ip_address}")
-
-#port()
 
 
 def cve():
     # Adresse IP à rechercher
-    ip_address = input('Entrer une adresse ip : ')
+    while True:
+        ip_address = input('Entrer une IP : ')
+        if is_valid_ip_address(ip_address):
+            break
+        else:
+            print(f"{ip_address} n'est pas une adresse IP valide. Veuillez entrer une adresse IP valide.")
+    print()
 
     # URL de la page de résultats de recherche pour l'adresse IP
     url = f'https://www.shodan.io/host/{ip_address}'
@@ -116,8 +151,76 @@ def cve():
         print(f"Aucunes CVE détectées {ip_address}")
 
 
-cve()
+
+def ping_ip():
+    print()
+    while True:
+        ip_addr = input('Entrer une IP : ')
+        if is_valid_ip_address(ip_addr):
+            break
+        else:
+            print(f"{ip_addr} n'est pas une adresse IP valide. Veuillez entrer une adresse IP valide.")
+    print()
+
+    ping_result = ping(ip_addr, verbose=True)
+
+    if ping_result.success:
+        print()
+    else:
+        print("Aucun ping possible.")
 
 
 
 
+def menu():
+    while True:
+        print()
+        print()
+        print("██╗██████╗     ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ ")
+        print("██║██╔══██╗    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗")
+        print("██║██████╔╝    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝")
+        print("██║██╔═══╝     ██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗")
+        print("██║██║         ██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║")
+        print("╚═╝╚═╝         ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝")
+        print()
+        print("╔════════════════════════════════════════════════════╗")
+        print("║                        Menu                        ║")
+        print("╠════════════════════════════════════════════════════╣")
+        print("║                                                    ║")
+        print("║ 1. Connaître l'adresse IP d'un site                ║")
+        print("║ 2. Rechercher des adresses e-mail sur un site      ║")
+        print("║ 3. Whois                                           ║")
+        print("║ 4. Scan de port                                    ║")
+        print("║ 5. Recherche de CVE                                ║")
+        print("║ 6. Ping IP                                         ║")
+        print("║ 7. Quitter                                         ║")
+        print("║                                                    ║")
+        print("╠════════════════════════════════════════════════════╣")
+        print("║               Développé par M3gac0rp               ║")
+        print("╚════════════════════════════════════════════════════╝")        
+        print("")
+
+
+        choix = int(input("Entrez votre choix : "))
+        print("")
+
+
+        if choix == 1:
+            recup_ip()
+        elif choix == 2:
+            mail()
+        elif choix == 3:
+            get_domain_info()
+        elif choix == 4:
+            port()
+        elif choix == 5:
+            cve()
+        elif choix == 6:
+            ping_ip()
+        elif choix == 7:
+            print("Au revoir !")
+            break
+        else:
+            print("Choix invalide. Veuillez réessayer.")
+os.system('cls')
+menu()
