@@ -7,10 +7,9 @@ import whois
 import socket
 from bs4 import BeautifulSoup
 import json
-from colorama import Fore, Style
 
 
-
+# Fonction pour récupérer l'adresse IP d'un site web
 def recup_ip():
     print()
     hostname = input("Entrer l'url du site : ").replace("https://", "")
@@ -21,6 +20,8 @@ def recup_ip():
     print(f"L'adresse IP de {hostname} est {ip_address}")
     print()
 
+
+# Fonction pour extraire toutes les adresses email d'une page web
 def extract_all_emails_from_webpage(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
@@ -30,6 +31,8 @@ def extract_all_emails_from_webpage(url):
         emails += re.findall(email_regex, tag)
     return emails
 
+
+# Fonction pour récupérer toutes les adresses email d'une page web et les écrire dans un fichier "emails.txt"
 def mail():
     print()
     while True:
@@ -60,6 +63,7 @@ def mail():
                 email_file.write(email + '\n')
 
 
+# Fonction pour récupérer des informations sur un nom de domaine
 def get_domain_info():
     print()
     domain_name = input('Nom de domaine/ip : ')
@@ -90,6 +94,7 @@ def is_valid_ip_address(ip_address):
         return False
 
 
+# Fonction pour récupérer les ouverts
 def port():
     # Adresse IP à rechercher
     print()
@@ -121,6 +126,7 @@ def port():
         print(f"Aucun port ouvert pour l'adresse IP {ip_address}")
 
 
+# Fonction pour rechercher les CVEs  
 def cve():
     # Adresse IP à rechercher
     while True:
@@ -151,7 +157,7 @@ def cve():
         print(f"Aucunes CVE détectées {ip_address}")
 
 
-
+# Fonction pour ping une ip
 def ping_ip():
     print()
     while True:
@@ -168,9 +174,6 @@ def ping_ip():
         print()
     else:
         print("Aucun ping possible.")
-
-
-
 
 def menu():
     while True:
