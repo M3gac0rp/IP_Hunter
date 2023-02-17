@@ -1,9 +1,0 @@
-Pour qu'il fonctionne, il faut installer les librairies suivantes :
-
-pip install pythonping
-
-pip install requests
-
-pip install whois
-
-pip install bs4
